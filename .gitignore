@@ -19,3 +19,6 @@
 *.exe
 *.out
 *.app
+
+build-DebugED-Desktop_Qt_5_3_MSVC2013_64bit-Debug/**
+build-DebugED-Desktop_Qt_5_3_MSVC2013_64bit-Release/**
