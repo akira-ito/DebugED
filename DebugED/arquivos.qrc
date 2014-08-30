@@ -5,5 +5,14 @@
         <file>images/save.png</file>
         <file>images/undo.png</file>
         <file>estilo/estilo.qss</file>
+        <file>images/play.ico</file>
+        <file>images/next.ico</file>
+        <file>images/previous.ico</file>
+        <file>images/stop.ico</file>
+        <file>images/replay.ico</file>
+        <file>images/zoom.ico</file>
+        <file>images/zoomIn.ico</file>
+        <file>images/zoomOut.ico</file>
+        <file>complete.txt</file>
     </qresource>
 </RCC>

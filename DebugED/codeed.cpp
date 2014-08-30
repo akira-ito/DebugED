@@ -1,60 +1,75 @@
 #include "codeed.h"
 #include "editor.h"
 #include <QtWidgets>
+#include <QDebug>
 
-CodeED::CodeED(QWidget *parent) :
-    QMainWindow(parent){
+CodeED::CodeED(QWidget *parent) : QMainWindow(parent){
     createActions();
     createMenus();
     createToolBars();
     createDockWidgets();
     createStatusBar();
+
 }
 
 void CodeED::createActions(){
-    _actionPlay = new QAction(QIcon(":/images/new.png"), tr("Executar"), this);
-    _actionPlay->setToolTip(tr("Executar o codigo."));
-    _actionPlay->setStatusTip(tr("Executar o codigo."));
+    _actionPlay = new QAction(QIcon(":/images/play.ico"), tr("Iniciar"), this);
+    _actionPlay->setToolTip(tr("Iniciar a execução."));
+    _actionPlay->setStatusTip(tr("Iniciar execução do codigo."));
     _actionPlay->setShortcuts(QKeySequence::New);
 
-    _actionNext = new QAction(QIcon(":/images/new.png"), tr("Próximo passo"), this);
+    _actionNext = new QAction(QIcon(":/images/next.ico"), tr("Próximo"), this);
     _actionNext->setToolTip(tr("Próximo passo"));
     _actionNext->setStatusTip(tr("Próximo passo do código"));
     _actionNext->setShortcuts(QKeySequence::New);
 
-    _actionPrevious = new QAction(QIcon(":/images/new.png"), tr("Passo anterior"), this);
+    _actionPrevious = new QAction(QIcon(":/images/previous.ico"), tr("Anterior"), this);
     _actionPrevious->setToolTip(tr("Próximo passo"));
     _actionPrevious->setStatusTip(tr("Próximo passo do código"));
     _actionPrevious->setShortcuts(QKeySequence::New);
 
-    _actionStop = new QAction(QIcon(":/images/new.png"), tr("Parar"), this);
+    _actionStop = new QAction(QIcon(":/images/stop.ico"), tr("Parar"), this);
     _actionStop->setToolTip(tr("Parar execução"));
     _actionStop->setStatusTip(tr("Parar a execução do código"));
     _actionStop->setShortcuts(QKeySequence::New);
 
+    _actionReplay = new QAction(QIcon(":/images/replay.ico"), tr("Reiniciar"), this);
+    _actionReplay->setToolTip(tr("Reiniciar execução"));
+    _actionReplay->setStatusTip(tr("Reiniciar a execução do código"));
+    _actionReplay->setShortcuts(QKeySequence::New);
 
+    _actionNext->setEnabled(false);
+    _actionPrevious->setEnabled(false);
+    _actionStop->setEnabled(false);
+    _actionReplay->setEnabled(false);
 
-
-    connect(_actionPlay, SIGNAL(triggered()), this, SLOT(novos()));
-
+    connect(_actionPlay, SIGNAL(triggered()), this, SLOT(play()));
+    connect(_actionNext, SIGNAL(triggered()), this, SLOT(next()));
+    connect(_actionPrevious, SIGNAL(triggered()), this, SLOT(previous()));
+    connect(_actionStop, SIGNAL(triggered()), this, SLOT(stop()));
+    connect(_actionReplay, SIGNAL(triggered()), this, SLOT(replay()));
 }
 
 void CodeED::createMenus(){
+    _menuFile = menuBar()->addMenu(tr("&Arquivo"));
 
+    _menuEdit = menuBar()->addMenu(tr("&Editar"));
+    _menuEdit->addSeparator();
 
+    _menuDebug = menuBar()->addMenu(tr("&Depurar"));
+    _menuDebug->addAction(_actionPlay);
+    _menuDebug->addAction(_actionNext);
+    _menuDebug->addAction(_actionPrevious);
+    _menuDebug->addAction(_actionStop);
+    _menuDebug->addAction(_actionReplay);
 
-    arquivo = menuBar()->addMenu(tr("&Arquivo"));
-    arquivo->addAction(_actionPlay);
+    _menuView = menuBar()->addMenu(tr("&Visualizar"));
 
-    menuBar()->addSeparator();
-
-    visualizar = menuBar()->addMenu(tr("visualizar"));
-
-    arquivo->addMenu(visualizar);
 }
 
 void CodeED::createToolBars(){
     _toolBarCode = addToolBar(tr("DebugED - Barra de ferramenta"));
+    _toolBarCode->setObjectName("toolBarCode");
     _toolBarCode->setAllowedAreas(Qt::ToolBarArea::LeftToolBarArea | Qt::ToolBarArea::TopToolBarArea);
     _toolBarCode->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextUnderIcon);
     _toolBarCode->setFloatable(false);
@@ -64,49 +79,82 @@ void CodeED::createToolBars(){
     _toolBarCode->addAction(_actionNext);
     _toolBarCode->addAction(_actionPrevious);
     _toolBarCode->addAction(_actionStop);
+    _toolBarCode->addAction(_actionReplay);
 
     /*visualizar->addAction(arquivoTool->toggleViewAction());*/
 }
 
 void CodeED::createDockWidgets(){
-    QDockWidget *a = new QDockWidget(tr("Estrutura"), this);
-    a->setFeatures(QDockWidget::DockWidgetMovable);
-    QListWidget *customerList = new QListWidget(a);
-    customerList->addItems(QStringList()
-            << "John Doe, Harmony Enterprises, 12 Lakeside, Ambleton"
-            << "Jane Doe, Memorabilia, 23 Watersedge, Beaton"
-            << "Tammy Shea, Tiblanka, 38 Sea Views, Carlton"
-            << "Tim Sheen, Caraba Gifts, 48 Ocean Way, Deal"
-            << "Sol Harvey, Chicos Coffee, 53 New Springs, Eccleston"
-            << "Sally Hobart, Tiroli Tea, 67 Long River, Fedula");
-    a->setWidget(customerList);
-    addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, a);
-    //a->setAllowedAreas(Qt::DockWidgetArea::LeftDockWidgetArea | Qt::DockWidgetArea::RightDockWidgetArea);
-    a->setFloating(false);
+    QDockWidget *dockStruct = new QDockWidget(tr("Estrutura"), this);
+    Editor *editorStruct = new Editor(NULL, dockStruct);
+    dockStruct->setFeatures(QDockWidget::DockWidgetMovable);
+    dockStruct->setWidget(editorStruct);
+    dockStruct->setFloating(false);
+    addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, dockStruct);
+    dockStruct->setMaximumHeight(120);
 
-    visualizar->addAction(a->toggleViewAction());
+    editorStruct->setPlainText("struct cel{\n\tint valor;\n\tstruct cel *next;\n}\ntypedef struct cel no;");
 
-    QDockWidget *b = new QDockWidget(tr("Implementação"), this);
+    QDockWidget *dockImplement = new QDockWidget(tr("Implementação"), this);
+    Editor *editorImplement = new Editor(this, dockImplement);
+    dockImplement->setFeatures(QDockWidget::DockWidgetMovable);
+    dockImplement->setWidget(editorImplement);
+    dockImplement->setFloating(false);
+    addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, dockImplement);
+    connect(editorImplement, SIGNAL(blockNext()), this, SLOT(blockNext()));
+    connect(editorImplement, SIGNAL(blockPrevious()), this, SLOT(blockPrevious()));
 
-    Editor *editor = new Editor(b);
-    b->setFeatures(QDockWidget::DockWidgetMovable);
-    b->setWidget(editor);
-    b->setFloating(false);
-    addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, b);
-    //b->setAllowedAreas(Qt::DockWidgetArea::LeftDockWidgetArea | Qt::DockWidgetArea::RightDockWidgetArea);
-    //splitDockWidget(a, b, Qt::Orientation::Vertical);
-    visualizar->addAction(b->toggleViewAction());
+    editorImplement->setPlainText("no *a = malloc(sizeof(no));\nno *b = malloc(sizeof(no));");
 
 }
 
 void CodeED::createStatusBar(){
-    statusBar()->addWidget(new QPushButton("Bem vindo"), 0);
+    statusBar()->addWidget(new QLabel(tr("DebugED - Debugador de Estrutura de Dados")));
 }
 
-/////SLOTS
-void CodeED::novos(){
+void CodeED::play(){
+    _actionPlay->setEnabled(false);
+    _actionNext->setEnabled(true);
+    _actionPrevious->setEnabled(false);
+    _actionStop->setEnabled(true);
+    _actionReplay->setEnabled(true);
 
+    emit passAction(Pass::Play);
 }
 
+void CodeED::next(){
+    _actionPrevious->setEnabled(true);
+
+    emit passAction(Pass::Next);
+}
+
+void CodeED::previous(){
+    _actionNext->setEnabled(true);
+
+    emit passAction(Pass::Previous);
+}
+
+void CodeED::stop(){
+    _actionPlay->setEnabled(true);
+    _actionNext->setEnabled(false);
+    _actionPrevious->setEnabled(false);
+    _actionStop->setEnabled(false);
+    _actionReplay->setEnabled(false);
+
+    emit passAction(Pass::Stop);
+}
+
+void CodeED::replay(){
+    play();
+}
+
+void CodeED::blockNext(){
+    _actionNext->setEnabled(false);
+    qDebug()<<"Next";
+}
+
+void CodeED::blockPrevious(){
+    _actionPrevious->setEnabled(false);
+}
 
 

@@ -5,8 +5,10 @@
 
 class CodeED : public QMainWindow{
     Q_OBJECT
+
 public:
     explicit CodeED(QWidget *parent = 0);
+    enum Pass{Play, Next, Previous, Stop, Replay};
 
 private:
     void createActions();
@@ -15,18 +17,30 @@ private:
     void createDockWidgets();
     void createStatusBar();
 
-    QMenu *arquivo;
-    QMenu *visualizar;
+    QMenu *_menuFile;
+    QMenu *_menuEdit;
+    QMenu *_menuDebug;
+    QMenu *_menuView;
 
     QAction *_actionPlay;
     QAction *_actionNext;
     QAction *_actionPrevious;
     QAction *_actionStop;
+    QAction *_actionReplay;
 
     QToolBar *_toolBarCode;
 
+signals:
+    void passAction(CodeED::Pass pass);
+
 private slots:
-   void novos();
+    void play();
+    void next();
+    void previous();
+    void stop();
+    void replay();
+    void blockNext();
+    void blockPrevious();
 };
 
 #endif // CODEED_H

@@ -17,7 +17,11 @@ private:
     ViewED *_view;
     SceneED *_scene;
     QToolBar *_toolBarView;
+    QAction *_actionZoomIn;
+    QAction *_actionZoom;
+    QAction *_actionZoomOut;
 
+    void createActions();
     void createToolBar();
 
 };
