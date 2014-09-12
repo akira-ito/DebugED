@@ -6,8 +6,9 @@
 #include <QMenu>
 #include <QDebug>
 
-Struct::Struct(StructType structType): _width(70), _height(30){
+Struct::Struct(StructType structType, QString var): _width(70), _height(30){
     _structType = structType;
+    _var = var;
 
     switch (_structType){
         case Cell:
@@ -44,6 +45,25 @@ Struct::Struct(StructType structType): _width(70), _height(30){
 
     //setPolygon(structItem);
     setPolygon( _structItem);
+}
+
+void Struct::setValues(QList<QString> values){
+    switch(_structType){
+    case Cell:
+        QGraphicsSimpleTextItem *a = new QGraphicsSimpleTextItem(this);
+        a->setText(QStringList(values).join("\n"));
+        break;
+    }
+}
+
+void Struct::addArrow(Arrow *arrow){
+    _arrows.push_back(arrow);
+}
+
+void Struct::removeArrow(Arrow *arrow){
+    int index = _arrows.indexOf(arrow);
+    if (index != -1)
+        _arrows.removeAt(index);
 }
 
 void Struct::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)

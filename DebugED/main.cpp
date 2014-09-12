@@ -16,8 +16,8 @@ int main(int argc, char *argv[]){
     file.open(QFile::ReadOnly);
     qApp->setStyleSheet(file.readAll());
 
-    CodeED *code = new CodeED();
     StructED *view = new StructED();
+    CodeED *code = new CodeED(view);
 
     page.addWidget(code);
     page.addWidget(view);

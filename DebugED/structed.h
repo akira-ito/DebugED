@@ -3,15 +3,19 @@
 
 #include "sceneed.h"
 #include "viewed.h"
+#include "struct.h"
 
 #include <QMainWindow>
 
+class Struct;
 class QGraphicsView;
 
 class StructED : public QMainWindow{
+    Q_OBJECT
 
 public:
     StructED(QWidget *parent = 0);
+    void clear() { _scene->clear(); }
 
 private:
     ViewED *_view;
@@ -23,6 +27,15 @@ private:
 
     void createActions();
     void createToolBar();
+
+    Struct *searchStruct(QString var);
+    Arrow *searchArrow(QString varA, QString varB);
+
+private slots:
+    void createStruct(Struct::StructType type, QString var);
+    void createArrow(QString varA, QString varB);
+    void removeStruct(Struct::StructType type, QString var);
+    void removeArrow(QString varA, QString varB);
 
 };
 

@@ -1,15 +1,22 @@
 #include "codeed.h"
 #include "editor.h"
+#include "struct.h"
+#include "structed.h"
 #include <QtWidgets>
 #include <QDebug>
 
-CodeED::CodeED(QWidget *parent) : QMainWindow(parent){
+class Struct;
+class StructED;
+
+
+CodeED::CodeED(StructED *structED, QWidget *parent) : QMainWindow(parent){
+    _structED = structED;
+
     createActions();
     createMenus();
     createToolBars();
     createDockWidgets();
     createStatusBar();
-
 }
 
 void CodeED::createActions(){
@@ -48,6 +55,15 @@ void CodeED::createActions(){
     connect(_actionPrevious, SIGNAL(triggered()), this, SLOT(previous()));
     connect(_actionStop, SIGNAL(triggered()), this, SLOT(stop()));
     connect(_actionReplay, SIGNAL(triggered()), this, SLOT(replay()));
+
+    QAction *action = new QAction(QIcon(":/images/replay.ico"), tr("Reiniciar"), this);
+    action->setToolTip(tr("Apontar"));
+    action->setStatusTip(tr("Apontar nó"));
+    action->setShortcuts(QKeySequence::New);
+    _actionSample.push_back(action);
+    connect(action, SIGNAL(triggered()),this, SLOT(triggerSample(Sample::Remove)));
+
+
 }
 
 void CodeED::createMenus(){
@@ -64,6 +80,9 @@ void CodeED::createMenus(){
     _menuDebug->addAction(_actionReplay);
 
     _menuView = menuBar()->addMenu(tr("&Visualizar"));
+
+    _menuSample = menuBar()->addMenu(tr("Soluções Simples"));
+    _menuSample->addActions(_actionSample);
 
 }
 
@@ -106,6 +125,10 @@ void CodeED::createDockWidgets(){
 
     editorImplement->setPlainText("no *a = malloc(sizeof(no));\nno *b = malloc(sizeof(no));");
 
+    connect(editorImplement, SIGNAL(createStruct(Struct::StructType,QString)), _structED, SLOT(createStruct(Struct::StructType,QString)));
+    connect(editorImplement, SIGNAL(createArrow(QString,QString)), _structED, SLOT(createArrow(QString,QString)));
+    connect(editorImplement, SIGNAL(removeStruct(Struct::StructType,QString)), _structED, SLOT(removeStruct(Struct::StructType,QString)));
+    connect(editorImplement, SIGNAL(removeArrow(QString,QString)), _structED, SLOT(removeArrow(QString,QString)));
 }
 
 void CodeED::createStatusBar(){
@@ -118,6 +141,8 @@ void CodeED::play(){
     _actionPrevious->setEnabled(false);
     _actionStop->setEnabled(true);
     _actionReplay->setEnabled(true);
+
+    _structED->clear();
 
     emit passAction(Pass::Play);
 }
@@ -150,11 +175,14 @@ void CodeED::replay(){
 
 void CodeED::blockNext(){
     _actionNext->setEnabled(false);
-    qDebug()<<"Next";
 }
 
 void CodeED::blockPrevious(){
     _actionPrevious->setEnabled(false);
+}
+
+void CodeED::triggerSample(CodeED::Sample sample){
+    qDebug()<<sample;
 }
 
 

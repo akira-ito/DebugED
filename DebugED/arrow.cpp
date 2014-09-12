@@ -10,6 +10,10 @@ Arrow::Arrow(Struct *a, Struct *b){
     _a = a;
     _b = b;
 
+    _b->addArrow(this);
+    _a->addArrow(this);
+    _var = _a->var()+":"+_b->var();
+
     setFlag(GraphicsItemFlag::ItemIsSelectable, true);
     setFlag(GraphicsItemFlag::ItemIsFocusable, true);
     setFlag(QGraphicsItem::ItemSendsGeometryChanges, true);
@@ -96,4 +100,9 @@ void Arrow::updatePosition()
 {
     QLineF line(mapFromItem(_a, 0, 0), mapFromItem(_b, 0, 0));
     setLine(line);
+}
+
+void Arrow::remove(){
+    _a->removeArrow(this);
+    _b->removeArrow(this);
 }

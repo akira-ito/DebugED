@@ -4,6 +4,7 @@
 #include "codeed.h"
 #include <QPlainTextEdit>
 #include <QObject>
+#include <QMap>
 
 class QCompleter;
 class QAbstractItemModel;
@@ -14,6 +15,7 @@ class Editor : public QPlainTextEdit{
 
 public:
     Editor(CodeED *codeED, QWidget *parent = 0);
+    enum Implementation { CreateNO, PointNO, SetValueNO};
     void lineNumberAreaPaintEvent(QPaintEvent *event);
 
 protected:
@@ -24,12 +26,15 @@ protected:
 
 private:
     void createCompleter();
-    QAbstractItemModel *modelFromFile(const QString& fileName);
+    QAbstractItemModel *createImplementation();
+    void processLine(QString textLine, bool next);
 
     QWidget *lineNumberArea;
     CodeED *_codeED;
     QCompleter *_completer;
     int lineWeigth;
+    QMap<QString, QString> *_mapImplement;
+    QStringList *_implement;
 
 private slots:
     void highlightCurrentLine();
@@ -41,6 +46,10 @@ private slots:
 signals:
     void blockNext();
     void blockPrevious();
+    void createStruct(Struct::StructType type, QString var);
+    void createArrow(QString varA, QString varB);
+    void removeStruct(Struct::StructType type, QString var);
+    void removeArrow(QString varA, QString varB);
 };
 
 class LineNumberArea : public QWidget

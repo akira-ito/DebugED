@@ -1,7 +1,12 @@
 #include "editor.h"
 #include "codeed.h"
+#include "struct.h"
 #include <QtWidgets>
 #include <QDebug>
+#include <QMap>
+
+class Struct;
+class QTextBlockUserData;
 
 Editor::Editor(CodeED *codeED, QWidget *parent) : QPlainTextEdit(parent), lineWeigth(0){
     _codeED = codeED;
@@ -24,7 +29,7 @@ Editor::Editor(CodeED *codeED, QWidget *parent) : QPlainTextEdit(parent), lineWe
 
 void Editor::createCompleter(){
     _completer = new QCompleter(this);
-    _completer->setModel(modelFromFile(":/complete.txt"));
+    _completer->setModel(createImplementation());
     _completer->setModelSorting(QCompleter::CaseInsensitivelySortedModel);
     _completer->setCaseSensitivity(Qt::CaseInsensitive);
     _completer->setWrapAround(false);
@@ -33,40 +38,72 @@ void Editor::createCompleter(){
     _completer->setMaxVisibleItems(10);
 
     connect(_completer, SIGNAL(activated(QString)),this, SLOT(insertCompletion(QString)));
+
+}
+
+QAbstractItemModel *Editor::createImplementation(){
+    _implement = new QStringList();
+    _implement->insert(CreateNO, "Criar nó");
+    _implement->insert(PointNO, "Apontar nó");
+
+    _mapImplement = new QMap<QString, QString>();
+    _mapImplement->insert(_implement->at(CreateNO), "NO *%1 = malloc(sizeof(NO *));");
+    _mapImplement->insert(_implement->at(PointNO), "%1->next = %2;");
+
+
+
+    return new QStringListModel(_mapImplement->keys(), _completer);
+}
+
+void Editor::processLine(QString textLine, bool next){
+    QStringList res = QStringList();
+    Implementation implementation;
+
+    foreach(QString code, _mapImplement->values()){
+        QRegExp regex = QRegExp(QRegExp::escape(code).replace(QRegExp("%[1-9]"), "([A-z0-9]*)"), Qt::CaseInsensitive);
+        if (regex.exactMatch(textLine)){
+            implementation = (Implementation) _implement->indexOf(_mapImplement->key(code));
+            res = regex.capturedTexts();
+            break;
+        }
+    }
+
+    switch(implementation){
+    case CreateNO:
+        if (next)
+            emit createStruct(Struct::Cell, res[1]);
+        else
+            emit removeStruct(Struct::Cell, res[1]);
+        break;
+    case PointNO:
+        if (next)
+            emit createArrow(res[1], res[2]);
+        else
+            emit removeArrow(res[1], res[2]);
+        break;
+    }
 }
 
 void Editor::insertCompletion(const QString &completion){
     if (_completer->widget() != this)
         return;
-    QTextCursor tc = textCursor();
-    int extra = completion.length() - _completer->completionPrefix().length();
-    tc.movePosition(QTextCursor::Left);
-    tc.movePosition(QTextCursor::EndOfWord);
-    tc.insertText(completion.right(extra));
-    setTextCursor(tc);
-}
 
-QAbstractItemModel *Editor::modelFromFile(const QString &fileName){
-    QFile file(fileName);
-    if (!file.open(QFile::ReadOnly))
-        return new QStringListModel(_completer);
-
-    #ifndef QT_NO_CURSOR
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    #endif
-    QStringList words;
-
-    while (!file.atEnd()) {
-        QByteArray line = file.readLine();
-        if (!line.isEmpty())
-            words << line.trimmed();
+    QString impl = _mapImplement->value(completion);
+    while (!textCursor().block().text().isEmpty()){
+        textCursor().deletePreviousChar();
     }
 
-    #ifndef QT_NO_CURSOR
-    QApplication::restoreOverrideCursor();
-    #endif
+    if (completion == _implement->at(CreateNO)){
+        QString var = QInputDialog::getText(this, completion, tr("Digite a variavel"));
+        if (!var.trimmed().isEmpty()){
+            insertPlainText(impl.arg(var.trimmed()));
+        }
+    }else if (completion == _implement->at(PointNO)){
+        QString varA = QInputDialog::getText(this, completion, tr("Digite a variavel"));
+        QString varB = QInputDialog::getText(this, completion, tr("Digite a variavel"));
+        insertPlainText(impl.arg(varA).arg(varB));
+    }
 
-    return new QStringListModel(words, _completer);
 }
 
 void Editor::updateLineNumberArea(const QRect &rect, int dy){
@@ -78,10 +115,10 @@ void Editor::updateLineNumberArea(const QRect &rect, int dy){
 }
 
 void Editor::passAction(CodeED::Pass pass){
+
     switch(pass){
     case CodeED::Pass::Play:
         moveCursor(QTextCursor::Start);
-
         break;
     case CodeED::Pass::Next:
         moveCursor(QTextCursor::NextBlock);
@@ -91,6 +128,7 @@ void Editor::passAction(CodeED::Pass pass){
         }
         break;
     case CodeED::Pass::Previous:
+        processLine(textCursor().block().text(), false);
         moveCursor(QTextCursor::PreviousBlock);
 
         if (!textCursor().movePosition(QTextCursor::PreviousBlock, QTextCursor::KeepAnchor)){
@@ -101,6 +139,8 @@ void Editor::passAction(CodeED::Pass pass){
 
         break;
     }
+    QString textLine = textCursor().block().text();
+    processLine(textLine, true);
 
     highlightCurrentLine();
 }
@@ -160,7 +200,7 @@ void Editor::keyPressEvent(QKeyEvent *e){
     tc.select(QTextCursor::LineUnderCursor);
     QString completionPrefix = tc.selectedText();
 
-    if (!isShortcut && (hasModifier || e->text().isEmpty()|| completionPrefix.length() < 0
+    if (!isShortcut && (hasModifier || e->text().isEmpty()|| completionPrefix.length() < 10
                       || eow.contains(e->text().right(1)))) {
         _completer->popup()->hide();
         return;

@@ -7,23 +7,14 @@
 #include "math.h"
 #include <QtWidgets>
 
+class Struct;
+
 StructED::StructED(QWidget *parent) : QMainWindow(parent){
     createActions();
     createToolBar();
 
     _scene = new SceneED;
     _view = new ViewED(_scene);
-
-    Struct *a = new Struct(Struct::Cell);
-    Struct *b = new Struct(Struct::Cell);
-    a->setPos(-250, 0);
-    _scene->addItem(a);
-    _scene->addItem(b);
-
-    Arrow *c = new Arrow(a,b);
-    c->setZValue(-1000.0);
-    _scene->addItem(c);
-    //c->updatePosition();
 
     setCentralWidget(_view);
 }
@@ -55,4 +46,49 @@ void StructED::createToolBar(){
     _toolBarView->addAction(_actionZoomIn);
     _toolBarView->addAction(_actionZoom);
     _toolBarView->addAction(_actionZoomOut);
+}
+
+Struct *StructED::searchStruct(QString var){
+    foreach (QGraphicsItem *item, _scene->items()){
+        if (item->type() == Struct::Type && qgraphicsitem_cast<Struct *>(item)->var() == var){
+            return qgraphicsitem_cast<Struct *>(item);
+        }
+    }
+    return NULL;
+}
+
+Arrow *StructED::searchArrow(QString varA, QString varB){
+    foreach (QGraphicsItem *item, _scene->items()){
+        if (item->type() == Arrow::Type && qgraphicsitem_cast<Arrow *>(item)->var() == varA+":"+varB){
+            return qgraphicsitem_cast<Arrow *>(item);
+        }
+    }
+    return NULL;
+}
+
+void StructED::createStruct(Struct::StructType type, QString var){
+    Struct *a = new Struct(type, var);
+    _scene->addItem(a);
+
+    qreal pos = _scene->itemsBoundingRect().width();
+    a->setPos(pos+30, 0);
+}
+
+void StructED::createArrow(QString varA, QString varB){
+    Struct *structA = searchStruct(varA);
+    Struct *structB = searchStruct(varB);
+    Arrow *c = new Arrow(structA,structB);
+    c->setZValue(-1000.0);
+    _scene->addItem(c);
+}
+
+void StructED::removeStruct(Struct::StructType type, QString var){
+    Struct *structed = searchStruct(var);
+    _scene->removeItem(structed);
+}
+
+void StructED::removeArrow(QString varA, QString varB){
+    Arrow *arrow = searchArrow(varA, varB);
+    arrow->remove();
+    _scene->removeItem(arrow);
 }
