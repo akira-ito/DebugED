@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_Editor_t {
-    QByteArrayData data[19];
-    char stringdata[214];
+    QByteArrayData data[22];
+    char stringdata[249];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -46,15 +46,19 @@ QT_MOC_LITERAL(13, 120, 20),
 QT_MOC_LITERAL(14, 141, 20),
 QT_MOC_LITERAL(15, 162, 10),
 QT_MOC_LITERAL(16, 173, 12),
-QT_MOC_LITERAL(17, 186, 16),
-QT_MOC_LITERAL(18, 203, 10)
+QT_MOC_LITERAL(17, 186, 12),
+QT_MOC_LITERAL(18, 199, 14),
+QT_MOC_LITERAL(19, 214, 6),
+QT_MOC_LITERAL(20, 221, 16),
+QT_MOC_LITERAL(21, 238, 10)
     },
     "Editor\0blockNext\0\0blockPrevious\0"
     "createStruct\0Struct::StructType\0type\0"
     "var\0createArrow\0varA\0varB\0removeStruct\0"
     "removeArrow\0highlightCurrentLine\0"
     "updateLineNumberArea\0passAction\0"
-    "CodeED::Pass\0insertCompletion\0completion"
+    "CodeED::Pass\0selectSample\0CodeED::Sample\0"
+    "sample\0insertCompletion\0completion"
 };
 #undef QT_MOC_LITERAL
 
@@ -64,7 +68,7 @@ static const uint qt_meta_data_Editor[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      10,   14, // methods
+      11,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -72,18 +76,19 @@ static const uint qt_meta_data_Editor[] = {
        6,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    0,   64,    2, 0x06 /* Public */,
-       3,    0,   65,    2, 0x06 /* Public */,
-       4,    2,   66,    2, 0x06 /* Public */,
-       8,    2,   71,    2, 0x06 /* Public */,
-      11,    2,   76,    2, 0x06 /* Public */,
-      12,    2,   81,    2, 0x06 /* Public */,
+       1,    0,   69,    2, 0x06 /* Public */,
+       3,    0,   70,    2, 0x06 /* Public */,
+       4,    2,   71,    2, 0x06 /* Public */,
+       8,    2,   76,    2, 0x06 /* Public */,
+      11,    2,   81,    2, 0x06 /* Public */,
+      12,    2,   86,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-      13,    0,   86,    2, 0x08 /* Private */,
-      14,    2,   87,    2, 0x08 /* Private */,
-      15,    1,   92,    2, 0x08 /* Private */,
-      17,    1,   95,    2, 0x08 /* Private */,
+      13,    0,   91,    2, 0x08 /* Private */,
+      14,    2,   92,    2, 0x08 /* Private */,
+      15,    1,   97,    2, 0x08 /* Private */,
+      17,    1,  100,    2, 0x08 /* Private */,
+      20,    1,  103,    2, 0x08 /* Private */,
 
  // signals: parameters
     QMetaType::Void,
@@ -97,7 +102,8 @@ static const uint qt_meta_data_Editor[] = {
     QMetaType::Void,
     QMetaType::Void, QMetaType::QRect, QMetaType::Int,    2,    2,
     QMetaType::Void, 0x80000000 | 16,    2,
-    QMetaType::Void, QMetaType::QString,   18,
+    QMetaType::Void, 0x80000000 | 18,   19,
+    QMetaType::Void, QMetaType::QString,   21,
 
        0        // eod
 };
@@ -116,7 +122,8 @@ void Editor::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void
         case 6: _t->highlightCurrentLine(); break;
         case 7: _t->updateLineNumberArea((*reinterpret_cast< const QRect(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
         case 8: _t->passAction((*reinterpret_cast< CodeED::Pass(*)>(_a[1]))); break;
-        case 9: _t->insertCompletion((*reinterpret_cast< const QString(*)>(_a[1]))); break;
+        case 9: _t->selectSample((*reinterpret_cast< CodeED::Sample(*)>(_a[1]))); break;
+        case 10: _t->insertCompletion((*reinterpret_cast< const QString(*)>(_a[1]))); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
@@ -186,13 +193,13 @@ int Editor::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 10)
+        if (_id < 11)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 10;
+        _id -= 11;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 10)
+        if (_id < 11)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 10;
+        _id -= 11;
     }
     return _id;
 }

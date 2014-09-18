@@ -29,13 +29,16 @@ private:
     void createToolBar();
 
     Struct *searchStruct(QString var);
-    Arrow *searchArrow(QString varA, QString varB);
+    Arrow *searchArrow(Struct *structA, Struct *structB);
+    Variable *searchVariable(QString varA);
 
 private slots:
     void createStruct(Struct::StructType type, QString var);
     void createArrow(QString varA, QString varB);
+    void createReceivePoint(QString varA, QString varB);
     void removeStruct(Struct::StructType type, QString var);
     void removeArrow(QString varA, QString varB);
+    void removeReceivePoint(QString varA, QString varB);
 
 };
 

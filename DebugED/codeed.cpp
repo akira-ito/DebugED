@@ -2,11 +2,14 @@
 #include "editor.h"
 #include "struct.h"
 #include "structed.h"
+
 #include <QtWidgets>
 #include <QDebug>
+#include <QActionGroup>
 
 class Struct;
 class StructED;
+class QActionGroup;
 
 
 CodeED::CodeED(StructED *structED, QWidget *parent) : QMainWindow(parent){
@@ -56,13 +59,22 @@ void CodeED::createActions(){
     connect(_actionStop, SIGNAL(triggered()), this, SLOT(stop()));
     connect(_actionReplay, SIGNAL(triggered()), this, SLOT(replay()));
 
-    QAction *action = new QAction(QIcon(":/images/replay.ico"), tr("Reiniciar"), this);
+    QAction *action = new QAction(QIcon(":/images/replay.ico"), tr("Apontar Nó"), this);
     action->setToolTip(tr("Apontar"));
     action->setStatusTip(tr("Apontar nó"));
     action->setShortcuts(QKeySequence::New);
-    _actionSample.push_back(action);
-    connect(action, SIGNAL(triggered()),this, SLOT(triggerSample(Sample::Remove)));
+    action->setData(CodeED::Point);
+    _actionSample = new QActionGroup(this);
+    _actionSample->addAction(action);
 
+    action = new QAction(QIcon(":/images/replay.ico"), tr("Remover Nó"), this);
+    action->setToolTip(tr("Remover"));
+    action->setStatusTip(tr("Remover nó"));
+    action->setShortcuts(QKeySequence::New);
+    action->setData(CodeED::Remove);
+    _actionSample->addAction(action);
+
+    connect(_actionSample, SIGNAL(triggered(QAction*)), this, SLOT(triggerSample(QAction*)));
 
 }
 
@@ -82,7 +94,7 @@ void CodeED::createMenus(){
     _menuView = menuBar()->addMenu(tr("&Visualizar"));
 
     _menuSample = menuBar()->addMenu(tr("Soluções Simples"));
-    _menuSample->addActions(_actionSample);
+    _menuSample->addActions(_actionSample->actions());
 
 }
 
@@ -123,12 +135,12 @@ void CodeED::createDockWidgets(){
     connect(editorImplement, SIGNAL(blockNext()), this, SLOT(blockNext()));
     connect(editorImplement, SIGNAL(blockPrevious()), this, SLOT(blockPrevious()));
 
-    editorImplement->setPlainText("no *a = malloc(sizeof(no));\nno *b = malloc(sizeof(no));");
-
     connect(editorImplement, SIGNAL(createStruct(Struct::StructType,QString)), _structED, SLOT(createStruct(Struct::StructType,QString)));
     connect(editorImplement, SIGNAL(createArrow(QString,QString)), _structED, SLOT(createArrow(QString,QString)));
+    connect(editorImplement, SIGNAL(createReceivePoint(QString,QString)), _structED, SLOT(createReceivePoint(QString,QString)));
     connect(editorImplement, SIGNAL(removeStruct(Struct::StructType,QString)), _structED, SLOT(removeStruct(Struct::StructType,QString)));
     connect(editorImplement, SIGNAL(removeArrow(QString,QString)), _structED, SLOT(removeArrow(QString,QString)));
+    connect(editorImplement, SIGNAL(removeReceivePoint(QString,QString)), _structED, SLOT(removeReceivePoint(QString,QString)));
 }
 
 void CodeED::createStatusBar(){
@@ -181,8 +193,8 @@ void CodeED::blockPrevious(){
     _actionPrevious->setEnabled(false);
 }
 
-void CodeED::triggerSample(CodeED::Sample sample){
-    qDebug()<<sample;
+void CodeED::triggerSample(QAction *action){
+    emit selectSample(static_cast<Sample>(action->data().toInt()));
 }
 
 

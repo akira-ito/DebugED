@@ -15,7 +15,7 @@ class Editor : public QPlainTextEdit{
 
 public:
     Editor(CodeED *codeED, QWidget *parent = 0);
-    enum Implementation { CreateNO, PointNO, SetValueNO};
+    enum Implementation { CreateNO, PointNO, ReceivePoint, SetValueNO};
     void lineNumberAreaPaintEvent(QPaintEvent *event);
 
 protected:
@@ -27,7 +27,8 @@ protected:
 private:
     void createCompleter();
     QAbstractItemModel *createImplementation();
-    void processLine(QString textLine, bool next);
+    bool processLine(QTextBlock block, bool next);
+    QStringList readSample(CodeED::Sample sample);
 
     QWidget *lineNumberArea;
     CodeED *_codeED;
@@ -40,7 +41,7 @@ private slots:
     void highlightCurrentLine();
     void updateLineNumberArea(const QRect &, int);
     void passAction(CodeED::Pass);
-
+    void selectSample(CodeED::Sample sample);
     void insertCompletion(const QString &completion);
 
 signals:
@@ -50,6 +51,8 @@ signals:
     void createArrow(QString varA, QString varB);
     void removeStruct(Struct::StructType type, QString var);
     void removeArrow(QString varA, QString varB);
+    void createReceivePoint(QString varA, QString varB);
+    void removeReceivePoint(QString varA, QString varB);
 };
 
 class LineNumberArea : public QWidget

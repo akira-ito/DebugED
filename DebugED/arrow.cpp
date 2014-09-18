@@ -4,6 +4,7 @@
 #include <QPainter>
 #include <QDebug>
 
+
 const qreal Pi = 3.14;
 
 Arrow::Arrow(Struct *a, Struct *b){
@@ -12,7 +13,8 @@ Arrow::Arrow(Struct *a, Struct *b){
 
     _b->addArrow(this);
     _a->addArrow(this);
-    _var = _a->var()+":"+_b->var();
+    _a->pointAddress(_b->addres());
+    _name = _a->addres()+":"+_b->addres();
 
     setFlag(GraphicsItemFlag::ItemIsSelectable, true);
     setFlag(GraphicsItemFlag::ItemIsFocusable, true);
@@ -22,16 +24,15 @@ Arrow::Arrow(Struct *a, Struct *b){
 }
 
 void Arrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
-          QWidget *)
-{
+          QWidget *){
     if (_a->collidesWithItem(_b))
         return;
 
     QPen myPen = pen();
-    myPen.setColor(Qt::red);
+    myPen.setColor(Qt::black);
     qreal arrowSize = 20;
     painter->setPen(myPen);
-    painter->setBrush(Qt::blue);
+    painter->setBrush(Qt::black);
 //! [4] //! [5]
 
     QLineF centerLine(_a->pos(), _b->pos());
@@ -58,25 +59,24 @@ void Arrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
     if (line().dy() >= 0)
         angle = (Pi * 2) - angle;
 
-        QPointF arrowP1 = line().p1() + QPointF(sin(angle + Pi / 3) * arrowSize,
-                                        cos(angle + Pi / 3) * arrowSize);
-        QPointF arrowP2 = line().p1() + QPointF(sin(angle + Pi - Pi / 3) * arrowSize,
-                                        cos(angle + Pi - Pi / 3) * arrowSize);
+    QPointF arrowP1 = line().p1() + QPointF(sin(angle + Pi / 3) * arrowSize,
+                                    cos(angle + Pi / 3) * arrowSize);
+    QPointF arrowP2 = line().p1() + QPointF(sin(angle + Pi - Pi / 3) * arrowSize,
+                                    cos(angle + Pi - Pi / 3) * arrowSize);
 
 
-        arrowHead.clear();
-        arrowHead << line().p1() << arrowP1 << arrowP2;
+    arrowHead.clear();
+    arrowHead << line().p1() << arrowP1 << arrowP2;
 //! [6] //! [7]
-        painter->drawLine(line());
-        painter->drawPolygon(arrowHead);
-        if (isSelected()) {
-            painter->setPen(QPen(Qt::red, 1, Qt::DashLine));
-            QLineF myLine = line();
-            myLine.translate(0, 4.0);
-            painter->drawLine(myLine);
-            myLine.translate(0,-8.0);
-            painter->drawLine(myLine);
-        qDebug()<<"akira";
+    painter->drawLine(line());
+    painter->drawPolygon(arrowHead);
+    if (isSelected()) {
+        painter->setPen(QPen(Qt::red, 1, Qt::DashLine));
+        QLineF myLine = line();
+        myLine.translate(0, 4.0);
+        painter->drawLine(myLine);
+        myLine.translate(0,-8.0);
+        painter->drawLine(myLine);
     }
 }
 QRectF Arrow::boundingRect() const

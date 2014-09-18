@@ -3,11 +3,13 @@
 #include "struct.h"
 #include "arrow.h"
 #include "viewed.h"
+#include "variable.h"
 
 #include "math.h"
 #include <QtWidgets>
 
 class Struct;
+class Variable;
 
 StructED::StructED(QWidget *parent) : QMainWindow(parent){
     createActions();
@@ -50,45 +52,83 @@ void StructED::createToolBar(){
 
 Struct *StructED::searchStruct(QString var){
     foreach (QGraphicsItem *item, _scene->items()){
-        if (item->type() == Struct::Type && qgraphicsitem_cast<Struct *>(item)->var() == var){
+        if (item->type() == Struct::Type && qgraphicsitem_cast<Struct *>(item)->variable()->variable() == var){
             return qgraphicsitem_cast<Struct *>(item);
         }
     }
     return NULL;
 }
 
-Arrow *StructED::searchArrow(QString varA, QString varB){
+Arrow *StructED::searchArrow(Struct *structA, Struct *structB){
     foreach (QGraphicsItem *item, _scene->items()){
-        if (item->type() == Arrow::Type && qgraphicsitem_cast<Arrow *>(item)->var() == varA+":"+varB){
+        if (item->type() == Arrow::Type && qgraphicsitem_cast<Arrow *>(item)->name() == structA->addres()+":"+structB->addres()){
             return qgraphicsitem_cast<Arrow *>(item);
         }
     }
     return NULL;
 }
 
+Variable *StructED::searchVariable(QString varA){
+    foreach (QGraphicsItem *item, _scene->items()){
+        if (item->type() == Variable::Type && qgraphicsitem_cast<Variable *>(item)->variable() == varA){
+            return qgraphicsitem_cast<Variable *>(item);
+        }
+    }
+    return NULL;
+}
+
 void StructED::createStruct(Struct::StructType type, QString var){
-    Struct *a = new Struct(type, var);
-    _scene->addItem(a);
+    Struct *structItem = new Struct(type);
+    _scene->addItem(structItem);
 
     qreal pos = _scene->itemsBoundingRect().width();
-    a->setPos(pos+30, 0);
+    structItem->setPos(pos+30, 0);
+
+    Variable *variable = new Variable(structItem, var);
+    _scene->addItem(variable);
+
+    structItem->setVariable(variable);
+    variable->updatePosition();
 }
 
 void StructED::createArrow(QString varA, QString varB){
     Struct *structA = searchStruct(varA);
     Struct *structB = searchStruct(varB);
+
     Arrow *c = new Arrow(structA,structB);
     c->setZValue(-1000.0);
     _scene->addItem(c);
+    c->updatePosition();
+}
+
+void StructED::createReceivePoint(QString varA, QString varB){
+    Variable *variableA = searchVariable(varA);
+    Variable *variableB = searchVariable(varB);
+
+    variableA->pointStruct(variableB->structItem());
+    variableA->updatePosition();
 }
 
 void StructED::removeStruct(Struct::StructType type, QString var){
     Struct *structed = searchStruct(var);
+    _scene->removeItem(structed->variable());
     _scene->removeItem(structed);
 }
 
 void StructED::removeArrow(QString varA, QString varB){
-    Arrow *arrow = searchArrow(varA, varB);
+    Variable *variableA = searchVariable(varA);
+    Variable *variableB = searchVariable(varB);
+
+    Arrow *arrow = searchArrow(variableA->structItem(), variableB->structItem());
+    qDebug() << arrow;
     arrow->remove();
     _scene->removeItem(arrow);
+}
+
+void StructED::removeReceivePoint(QString varA, QString varB){
+    Variable *variableA = searchVariable(varA);
+    Variable *variableB = searchVariable(varB);
+
+    variableA->removeStruct(variableB->structItem());
+
 }

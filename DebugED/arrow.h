@@ -14,7 +14,7 @@ public:
     Arrow(Struct *a, Struct *b);
     Struct *a() const { return _a; }
     Struct *b() const { return _b; }
-    QString var() { return _var; }
+    QString name() { return _name; }
     QRectF boundingRect() const;
     QPainterPath Arrow::shape() const;
     void updatePosition();
@@ -28,7 +28,7 @@ protected:
 private:
     Struct *_a;
     Struct *_b;
-    QString _var;
+    QString _name;
 
     QPolygonF arrowHead;
 };

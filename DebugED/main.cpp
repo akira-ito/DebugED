@@ -5,9 +5,13 @@
 #include <QApplication>
 #include <QMainWindow>
 #include <QSplitter>
+#include <QTime>
 #include <QFile>
 
 int main(int argc, char *argv[]){
+    QTime time = QTime::currentTime();
+    qsrand((uint)time.msec());
+
     QApplication a(argc, argv);
     Q_INIT_RESOURCE(arquivos);
     QSplitter page;

@@ -3,7 +3,7 @@
 #include "struct.h"
 #include <QtWidgets>
 #include <QDebug>
-#include <QMap>
+#include <QIODevice>
 
 class Struct;
 class QTextBlockUserData;
@@ -14,8 +14,10 @@ Editor::Editor(CodeED *codeED, QWidget *parent) : QPlainTextEdit(parent), lineWe
 
     connect(this, SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
     connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
-    if (codeED != NULL)
+    if (codeED != NULL){
         connect(_codeED, SIGNAL(passAction(CodeED::Pass)), this, SLOT(passAction(CodeED::Pass)));
+        connect(_codeED, SIGNAL(selectSample(CodeED::Sample)), this, SLOT(selectSample(CodeED::Sample)));
+    }
 
     createCompleter();
     highlightCurrentLine();
@@ -45,17 +47,18 @@ QAbstractItemModel *Editor::createImplementation(){
     _implement = new QStringList();
     _implement->insert(CreateNO, "Criar nó");
     _implement->insert(PointNO, "Apontar nó");
+    _implement->insert(ReceivePoint, "Receber ponteiro de nó");
 
     _mapImplement = new QMap<QString, QString>();
     _mapImplement->insert(_implement->at(CreateNO), "NO *%1 = malloc(sizeof(NO *));");
     _mapImplement->insert(_implement->at(PointNO), "%1->next = %2;");
-
-
+    _mapImplement->insert(_implement->at(ReceivePoint), "%1 = %2;");
 
     return new QStringListModel(_mapImplement->keys(), _completer);
 }
 
-void Editor::processLine(QString textLine, bool next){
+bool Editor::processLine(QTextBlock block, bool next){
+    QString textLine = block.text();
     QStringList res = QStringList();
     Implementation implementation;
 
@@ -72,16 +75,50 @@ void Editor::processLine(QString textLine, bool next){
     case CreateNO:
         if (next)
             emit createStruct(Struct::Cell, res[1]);
-        else
+        else{
             emit removeStruct(Struct::Cell, res[1]);
+            return false;
+        }
         break;
     case PointNO:
         if (next)
             emit createArrow(res[1], res[2]);
-        else
+        else{
             emit removeArrow(res[1], res[2]);
+            return false;
+        }
+        break;
+    case ReceivePoint:
+        if (next){
+            emit createReceivePoint(res[1], res[2]);
+        }else{
+            emit removeReceivePoint(res[1], res[2]);
+        }
         break;
     }
+    return true;
+}
+
+QStringList Editor::readSample(CodeED::Sample sample){
+    QString fileName = "";
+    switch(sample){
+    case CodeED::Sample::Point:
+        fileName = "apontarNo";
+        break;
+    case CodeED::Sample::Remove:
+        fileName = "removerNo";
+        break;
+    }
+
+    QStringList lines;
+    QFile file(":/exemplos/"+fileName+".txt");
+    if(!file.open(QFile::ReadOnly | QFile::Text))
+        qDebug() << " Could not open file for writing";
+    else
+        while (!file.atEnd())
+            lines << file.readLine();
+
+    return lines;
 }
 
 void Editor::insertCompletion(const QString &completion){
@@ -102,6 +139,10 @@ void Editor::insertCompletion(const QString &completion){
         QString varA = QInputDialog::getText(this, completion, tr("Digite a variavel"));
         QString varB = QInputDialog::getText(this, completion, tr("Digite a variavel"));
         insertPlainText(impl.arg(varA).arg(varB));
+    }else if (completion == _implement->at(ReceivePoint)){
+        QString varA = QInputDialog::getText(this, completion, tr("Digite a variavel"));
+        QString varB = QInputDialog::getText(this, completion, tr("Digite a variavel"));
+        insertPlainText(impl.arg(varA).arg(varB));
     }
 
 }
@@ -115,7 +156,7 @@ void Editor::updateLineNumberArea(const QRect &rect, int dy){
 }
 
 void Editor::passAction(CodeED::Pass pass){
-
+    bool executeLine = true;
     switch(pass){
     case CodeED::Pass::Play:
         moveCursor(QTextCursor::Start);
@@ -128,7 +169,7 @@ void Editor::passAction(CodeED::Pass pass){
         }
         break;
     case CodeED::Pass::Previous:
-        processLine(textCursor().block().text(), false);
+        executeLine = processLine(textCursor().block(), false);
         moveCursor(QTextCursor::PreviousBlock);
 
         if (!textCursor().movePosition(QTextCursor::PreviousBlock, QTextCursor::KeepAnchor)){
@@ -136,13 +177,24 @@ void Editor::passAction(CodeED::Pass pass){
         }
         break;
     case CodeED::Pass::Stop:
-
+        return;
         break;
     }
-    QString textLine = textCursor().block().text();
-    processLine(textLine, true);
 
+    if (executeLine)
+        processLine(textCursor().block(), true);
     highlightCurrentLine();
+}
+
+void Editor::selectSample(CodeED::Sample sample){
+    document()->clear();
+    QStringList lines = readSample(sample);
+    foreach (QString line, lines){
+        insertPlainText(line);
+    }
+    moveCursor(QTextCursor::Start);
+    highlightCurrentLine();
+
 }
 
 void Editor::resizeEvent(QResizeEvent *e)

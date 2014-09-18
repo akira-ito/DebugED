@@ -13,6 +13,7 @@
         <file>images/zoom.ico</file>
         <file>images/zoomIn.ico</file>
         <file>images/zoomOut.ico</file>
-        <file>complete.txt</file>
+        <file>exemplos/apontarNo.txt</file>
+        <file>exemplos/removerNo.txt</file>
     </qresource>
 </RCC>

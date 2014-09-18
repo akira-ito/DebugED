@@ -3,8 +3,10 @@
 
 #include "structed.h"
 #include <QMainWindow>
+#include <QActionGroup>
 
 class StructED;
+class QActionGroup;
 
 class CodeED : public QMainWindow{
     Q_OBJECT
@@ -18,6 +20,7 @@ public:
 
 signals:
     void passAction(CodeED::Pass pass);
+    void selectSample(CodeED::Sample sample);
 
 private slots:
     void play();
@@ -27,7 +30,7 @@ private slots:
     void replay();
     void blockNext();
     void blockPrevious();
-    void triggerSample(CodeED::Sample);
+    void triggerSample(QAction *action);
 
 private:
     void createActions();
@@ -47,7 +50,7 @@ private:
     QAction *_actionPrevious;
     QAction *_actionStop;
     QAction *_actionReplay;
-    QList<QAction *> _actionSample;
+    QActionGroup *_actionSample;
 
     QToolBar *_toolBarCode;
 

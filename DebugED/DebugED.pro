@@ -19,7 +19,8 @@ SOURCES += main.cpp\
     arrow.cpp \
     structed.cpp \
     viewed.cpp \
-    editor.cpp
+    editor.cpp \
+    variable.cpp
 
 HEADERS  += \
     codeed.h \
@@ -28,7 +29,8 @@ HEADERS  += \
     arrow.h \
     structed.h \
     viewed.h \
-    editor.h
+    editor.h \
+    variable.h
 
 RESOURCES += \
     arquivos.qrc

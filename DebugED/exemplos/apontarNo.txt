@@ -1,0 +1,5 @@
+NO *a = malloc(sizeof(NO *));
+NO *b = malloc(sizeof(NO *));
+a->next = b;
+NO *c = malloc(sizeof(NO *));
+b->next = c;
