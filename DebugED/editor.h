@@ -15,8 +15,9 @@ class Editor : public QPlainTextEdit{
 
 public:
     Editor(CodeED *codeED, QWidget *parent = 0);
-    enum Implementation { CreateNO, PointNO, ReceivePoint, SetValueNO};
+    enum Implementation { CreateNO, CreateNOVar, PointNOCreate,PointNO, PointNONext, PointNextNONext, ReceivePoint, Free, SetValueNO};
     void lineNumberAreaPaintEvent(QPaintEvent *event);
+    QMap<QString, QString> *mapImplement(){ return _mapImplement; }
 
 protected:
     void resizeEvent(QResizeEvent *event);
@@ -26,8 +27,10 @@ protected:
 
 private:
     void createCompleter();
+    void deleteCurrentLine();
     QAbstractItemModel *createImplementation();
-    bool processLine(QTextBlock block, bool next);
+    QPair<QString, QStringList> *interpretLine(QString textLine);
+    void processLine(QTextBlock block, bool next);
     QStringList readSample(CodeED::Sample sample);
 
     QWidget *lineNumberArea;
@@ -36,23 +39,45 @@ private:
     int lineWeigth;
     QMap<QString, QString> *_mapImplement;
     QStringList *_implement;
+    QStringList *_args;
+    bool _endLine;
+    QString _fileName;
 
 private slots:
     void highlightCurrentLine();
     void updateLineNumberArea(const QRect &, int);
     void passAction(CodeED::Pass);
     void selectSample(CodeED::Sample sample);
-    void insertCompletion(const QString &completion);
+    bool insertCompletion(const QString &completion, QStringList list = QStringList());
+    void highlighted(const QString &text);
+    void fileNew();
+    void fileOpen();
+    void fileSave();
+    void fileSaveAs();
+    void exit();
 
 signals:
     void blockNext();
     void blockPrevious();
+    void createVarPointStruct(Struct::StructType, QString var, QString varStruct);
+    void removeVarPointStruct(Struct::StructType, QString var, QString varStruct);
     void createStruct(Struct::StructType type, QString var);
-    void createArrow(QString varA, QString varB);
     void removeStruct(Struct::StructType type, QString var);
+    void createNextNoCreate(Struct::StructType, QString var);
+    void removeNextNoCreate(Struct::StructType, QString var);
+    void createArrow(QString varA, QString varB);
     void removeArrow(QString varA, QString varB);
     void createReceivePoint(QString varA, QString varB);
     void removeReceivePoint(QString varA, QString varB);
+    void createReceivePointNext(QString var, QString varStruct);
+    void removeReceivePointNext(QString var, QString varStruct);
+    void createReceiveNextPointNext(QString varStructA, QString varStructB);
+    void removeReceiveNextPointNext(QString varStructA, QString varStructB);
+    void createFree(QString var);
+    void removeFree(QString var);
+    void setValueNo(QString var, QString val);
+    void clearStructed();
+
 };
 
 class LineNumberArea : public QWidget

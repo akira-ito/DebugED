@@ -20,7 +20,8 @@ SOURCES += main.cpp\
     structed.cpp \
     viewed.cpp \
     editor.cpp \
-    variable.cpp
+    variable.cpp \
+    implementmodal.cpp
 
 HEADERS  += \
     codeed.h \
@@ -30,7 +31,8 @@ HEADERS  += \
     structed.h \
     viewed.h \
     editor.h \
-    variable.h
+    variable.h \
+    implementmodal.h
 
 RESOURCES += \
     arquivos.qrc

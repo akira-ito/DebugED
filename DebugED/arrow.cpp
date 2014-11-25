@@ -11,7 +11,10 @@ Arrow::Arrow(Struct *a, Struct *b){
     _a = a;
     _b = b;
 
-    _b->addArrow(this);
+    if (!_a->arrows().isEmpty())
+        _a->arrows().last()->setOpacity(0);
+
+    //_b->addArrow(this);
     _a->addArrow(this);
     _a->pointAddress(_b->addres());
     _name = _a->addres()+":"+_b->addres();
@@ -19,12 +22,10 @@ Arrow::Arrow(Struct *a, Struct *b){
     setFlag(GraphicsItemFlag::ItemIsSelectable, true);
     setFlag(GraphicsItemFlag::ItemIsFocusable, true);
     setFlag(QGraphicsItem::ItemSendsGeometryChanges, true);
-
-
+    setZValue(-1000.0);
 }
 
-void Arrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
-          QWidget *){
+void Arrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *){
     if (_a->collidesWithItem(_b))
         return;
 
@@ -96,13 +97,23 @@ QPainterPath Arrow::shape() const
     return path;
 }
 
-void Arrow::updatePosition()
-{
+void Arrow::updatePosition(){
     QLineF line(mapFromItem(_a, 0, 0), mapFromItem(_b, 0, 0));
     setLine(line);
 }
 
 void Arrow::remove(){
     _a->removeArrow(this);
-    _b->removeArrow(this);
+    if (!_a->arrows().isEmpty()){
+        _a->arrows().last()->setOpacity(1);
+        _a->pointAddress(_a->arrows().first()->b()->addres());
+    }else{
+        _a->removePointAddress();
+    }
+    //_b->removeArrow(this);
 }
+
+bool Arrow::receivePoint(Struct *structB){
+    return structB->addres() == _b->addres() && _a->pointAddress() == structB->addres() && _a->opacity() == 1;
+}
+

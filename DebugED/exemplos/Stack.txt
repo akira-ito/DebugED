@@ -1,0 +1,9 @@
+NO *cabeca = (NO *)malloc(sizeof(NO));
+NO *fim = (NO *)malloc(sizeof(NO));
+cabeca->next = fim;
+NO *nova = (NO *)malloc(sizeof(NO));
+nova->next = cabeca->next;
+cabeca->next = nova;
+NO *outra = (NO *)malloc(sizeof(NO));
+outra->next = cabeca->next;
+cabeca->next = outra;

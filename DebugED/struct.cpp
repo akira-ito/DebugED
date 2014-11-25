@@ -28,15 +28,16 @@ Struct::Struct(StructType structType): _width(70), _height(30){
     _head->setPolygon(_structHead);
 
     _pointAddress = new QGraphicsTextItem(_head);
-    _pointAddress->setPos(75 ,-30);
-    _pointAddress->setFont(QFont("Timer new roma", 12, QFont::Bold, true));
+    _pointAddress->setPos(70 ,-30);
+    _pointAddress->setFont(QFont("Timer new roma", 9, QFont::Bold, true));
     _pointAddress->setToolTip(tr("Endereço da celula apontada."));
     _pointAddress->setDefaultTextColor(QColor(255, 0, 250, 100));
     _pointAddress->setRotation(90);
 
-    _address = (qrand() % (4294967295));
+    _address = QString::number(qrand() % (4294967295), 16).toUpper();
+
     QGraphicsTextItem *address = new QGraphicsTextItem(this);
-    address->setPlainText(QString::number(_address));
+    address->setPlainText(_address);
     address->setPos(-20, -50);
     address->setFont(QFont("Timer new roma", 13, QFont::Bold, true));
     address->setToolTip(tr("Endereço de memoria."));
@@ -59,8 +60,23 @@ void Struct::setValues(QList<QString> values){
     }
 }
 
-void Struct::setVariable(Variable *variable){
-    _variable = variable;
+void Struct::addVariable(Variable *variable){
+    _variables.push_back(variable);
+}
+
+void Struct::removeVariable(Variable *variable){
+    int index = _variables.indexOf(variable);
+    if (index != -1)
+        _variables.removeAt(index);
+}
+
+bool Struct::matchVariable(QString variable){
+    foreach(Variable *var,  _variables){
+        if (var->variable() == variable){
+            return true;
+        }
+    }
+    return false;
 }
 
 void Struct::addArrow(Arrow *arrow){
@@ -73,8 +89,12 @@ void Struct::removeArrow(Arrow *arrow){
         _arrows.removeAt(index);
 }
 
-void Struct::pointAddress(int address){
-    _pointAddress->setPlainText(QString::number(address));
+void Struct::pointAddress(QString address){
+    _pointAddress->setPlainText(address);
+}
+
+void Struct::removePointAddress(){
+    _pointAddress->setPlainText("");
 }
 
 void Struct::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
@@ -88,12 +108,10 @@ void Struct::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 }
 
 QVariant Struct::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value){
-
     if (change == QGraphicsItem::ItemPositionChange) {
         foreach (Arrow *arrow, _arrows) {
             arrow->updatePosition();
         }
     }
-
     return value;
 }

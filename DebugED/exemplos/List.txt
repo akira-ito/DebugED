@@ -1,0 +1,8 @@
+NO *inicio = (NO *)malloc(sizeof(NO));
+NO *aux = inicio;
+aux->next = (NO *)malloc(sizeof(NO));
+aux = aux->next;
+aux->next = (NO *)malloc(sizeof(NO));
+aux = aux->next;
+NO *fim = (NO *)malloc(sizeof(NO));
+aux->next = fim;

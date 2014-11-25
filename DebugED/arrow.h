@@ -20,10 +20,10 @@ public:
     void updatePosition();
     int type() const { return Type; }
     void remove();
+    bool receivePoint(Struct *structB);
 
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
-
 
 private:
     Struct *_a;

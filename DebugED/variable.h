@@ -6,10 +6,9 @@
 #include <QGraphicsTextItem>
 #include <QStack>
 
-
 class Struct;
 
-class Variable : public QGraphicsLineItem{
+class Variable : public QGraphicsLineItem, QObject{
 
 public:
     Variable(Struct *structItem, QString &var);
@@ -19,6 +18,7 @@ public:
     QString variable() { return _variable->toPlainText(); }
     QRectF boundingRect() const;
     QPainterPath Variable::shape() const;
+    QString address() { return _address; }
     void setVariable(QString &var);
     void pointStruct(Struct *structItem);
     void removeStruct(Struct *structItem);
@@ -31,10 +31,8 @@ private:
     QStack<Struct *> _structItem;
     QGraphicsTextItem *_variable;
     QPolygonF arrowHead;
+    QString _address;
 
-signals:
-
-public slots:
 
 };
 

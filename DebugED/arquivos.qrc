@@ -1,9 +1,6 @@
 <RCC>
     <qresource prefix="/">
-        <file>images/new.png</file>
         <file>images/print.png</file>
-        <file>images/save.png</file>
-        <file>images/undo.png</file>
         <file>estilo/estilo.qss</file>
         <file>images/play.ico</file>
         <file>images/next.ico</file>
@@ -13,7 +10,27 @@
         <file>images/zoom.ico</file>
         <file>images/zoomIn.ico</file>
         <file>images/zoomOut.ico</file>
-        <file>exemplos/apontarNo.txt</file>
-        <file>exemplos/removerNo.txt</file>
+        <file>images/currentLine.ico</file>
+        <file>exemplos/List.txt</file>
+        <file>exemplos/Stack.txt</file>
+        <file>exemplos/UnList.txt</file>
+        <file>exemplos/UnStack.txt</file>
+        <file>images/example.ico</file>
+        <file>images/fullScreen.ico</file>
+        <file>images/command.ico</file>
+        <file>images/cancel.ico</file>
+        <file>images/confirm.ico</file>
+        <file>images/delet.ico</file>
+        <file>images/new.ico</file>
+        <file>images/save.ico</file>
+        <file>images/exit.ico</file>
+        <file>images/open.ico</file>
+        <file>images/saveAs.ico</file>
+        <file>images/struct.ico</file>
+        <file>images/action.ico</file>
+        <file>images/edit.ico</file>
+        <file>images/file.ico</file>
+        <file>images/sample.ico</file>
+        <file>images/view.ico</file>
     </qresource>
 </RCC>

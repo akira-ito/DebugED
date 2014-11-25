@@ -1,5 +1,6 @@
-QToolBar#toolBarCode{background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-stop:0 lightgray, stop:1 darkgray);
+QToolBar#toolBarCode{
+    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+    stop:0 lightgray, stop:1 beige);
 }
 QToolBar#toolBarCode > QWidget{
     width:70px;
@@ -8,10 +9,6 @@ QToolBar#toolBarCode > QWidget{
 QLabel{
     color: blue;
 }
-.QWidget {
-   background-color: beige;
-}
-
 /* Nice Windows-XP-style password character. */
 QLineEdit[echoMode="2"] {
     lineedit-password-character: 9679;
@@ -77,23 +74,6 @@ QListView::item:hover {
     background-color: wheat;
 }
 
-/* We reserve 1 pixel space in padding. When we get the focus,
-   we kill the padding and enlarge the border. This makes the items
-   glow. */
-QLineEdit, QFrame {
-    border-width: 2px;
-    padding: 1px;
-    border-style: solid;
-    border-color: darkkhaki;
-    border-radius: 5px;
-}
-
-/* As mentioned above, eliminate the padding and increase the border. */
-QLineEdit:focus, QFrame:focus {
-    border-width: 3px;
-    padding: 0px;
-}
-
 /* A QLabel is a QFrame ... */
 QLabel {
     border: none;
@@ -119,4 +99,7 @@ QDialogButtonBox {
     button-layout: 0;
 }
 
+ QTableView {
+     selection-background-color: #FFAA22;
+ }
 

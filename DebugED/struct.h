@@ -40,15 +40,20 @@ public:
     QList<QString> values() const { return _values; }
     qreal width() const { return _width; }
     qreal height() const { return _height; }
-    Variable *variable() const { return _variable; }
+    QList<Variable *> variables() const { return _variables; }
     QList<Arrow *> arrows(){ return _arrows; }
-    int addres() { return _address; }
+    QString addres() { return _address; }
     int type() const { return Type;}
+    QString pointAddress() { return _pointAddress->toPlainText(); }
 
-    void setVariable(Variable *variable);
+
+    void addVariable(Variable *variable);
+    void removeVariable(Variable *variable);
+    bool matchVariable(QString variable);
     void addArrow(Arrow *arrow);
     void removeArrow(Arrow *arrow);
-    void pointAddress(int address);
+    void pointAddress(QString address);
+    void removePointAddress();
 
 protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
@@ -61,9 +66,9 @@ private:
     QGraphicsPolygonItem* _head;
     QList<QString> _values;
     QList<Arrow *> _arrows;
-    Variable *_variable;
+    QList<Variable *> _variables;
     QGraphicsTextItem *_pointAddress;
-    int _address;
+    QString _address;
     qreal _width;
     qreal _height;
 

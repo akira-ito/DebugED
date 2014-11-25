@@ -14,7 +14,7 @@ class CodeED : public QMainWindow{
 public:
     CodeED(StructED *structED, QWidget *parent = 0);
     enum Pass{Play, Next, Previous, Stop, Replay};
-    enum Sample{Point, Remove};
+    enum Sample{List, UnList, Stack, UnStack};
 
     StructED *structED() const { return _structED; }
 
@@ -31,6 +31,7 @@ private slots:
     void blockNext();
     void blockPrevious();
     void triggerSample(QAction *action);
+    void about();
 
 private:
     void createActions();
@@ -51,6 +52,12 @@ private:
     QAction *_actionStop;
     QAction *_actionReplay;
     QActionGroup *_actionSample;
+    QAction *_actionNew;
+    QAction *_actionOpen;
+    QAction *_actionSave;
+    QAction *_actionSaveAs;
+    QAction *_actionExit;
+    QAction *_actionAbout;
 
     QToolBar *_toolBarCode;
 
